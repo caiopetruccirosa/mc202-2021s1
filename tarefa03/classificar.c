@@ -166,10 +166,9 @@ void filtrar_nomes(char nomes[100][30], int n, char filtrados[100][30], int *m, 
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             if (i != j) {
-                int homonimos = sao_homonimos(nomes[i], nomes[j]);
-                int parentes = sao_parentes(nomes[i], nomes[j]);
-
-                if ((strcmp(opcao, "homonimos") == 0 && homonimos) || (strcmp(opcao, "parentes") == 0 && parentes)) {
+                if ((strcmp(opcao, "homonimos") == 0 && sao_homonimos(nomes[i], nomes[j])) || 
+                    (strcmp(opcao, "parentes") == 0 && sao_parentes(nomes[i], nomes[j]))) {
+                    
                     strcpy(filtrados[*m], nomes[i]);
                     (*m)++;
 
