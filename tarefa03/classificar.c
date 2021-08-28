@@ -68,7 +68,7 @@ int sao_homonimos(char nome1[30], char nome2[30]) {
     return 1;
 }
 
-void ordenar(char v[100][30], int n) {
+void ordenar_homonimos(char v[100][30], int n) {
     for (int i = 0; i < n; i++) {
         int menor = i;
 
@@ -110,36 +110,34 @@ void ordenar_parentes(char v[100][30], int n) {
     return;
 }
 
-void achar_homonimos(char homonimos[100][30], int *n, char nomes[100][30], int m) {
-    *n = 0;
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < m; j++) {
+void filtrar_homonimos(char nomes[100][30], int n, char homonimos[100][30], int *m) {
+    *m = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
             if (i != j && sao_homonimos(nomes[i], nomes[j]) == 1) {
-                strcpy(homonimos[*n], nomes[i]);
-                (*n)++;
+                strcpy(homonimos[*m], nomes[i]);
+                (*m)++;
+                
                 break;
             }
         }
     }
-
-    ordenar(homonimos, *n);
 
     return;
 }
 
-void achar_parentes(char parentes[100][30], int *n, char nomes[100][30], int m) {
-    *n = 0;
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < m; j++) {
+void filtrar_parentes(char nomes[100][30], int n, char parentes[100][30], int *m) {
+    *m = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
             if (i != j && sao_parentes(nomes[i], nomes[j]) == 1) {
-                strcpy(parentes[*n], nomes[i]);
-                (*n)++;
+                strcpy(parentes[*m], nomes[i]);
+                (*m)++;
+                
                 break;
             }
         }
     }
-
-    ordenar_parentes(parentes, *n);
 
     return;
 }
@@ -157,9 +155,11 @@ int main() {
     int m;
     char resultado[100][30];
     if (strcmp(opcao, "homonimos") == 0) {
-        achar_homonimos(resultado, &m, nomes, n);
+        filtrar_homonimos(nomes, n, resultado, &m);
+        ordenar_homonimos(resultado, m);
     } else if (strcmp(opcao, "parentes") == 0) {
-        achar_parentes(resultado, &m, nomes, n);
+        filtrar_parentes(nomes, n, resultado, &m);
+        ordenar_parentes(resultado, m);
     }
 
     imprimir_nomes(resultado, m);
