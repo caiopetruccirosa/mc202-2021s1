@@ -55,25 +55,25 @@ int compara_data(Data data1, Data data2) {
 int diferenca_data(Data data1, Data data2) {
     int dias_por_mes[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-    Data dataMaior = data1;
-    Data dataMenor = data2;
+    Data data_maior = data1;
+    Data data_menor = data2;
 
     if (compara_data(data1, data2) < 0) {
-        dataMaior = data2;
-        dataMenor = data1;
+        data_maior = data2;
+        data_menor = data1;
     }
 
-    int ano_diff = dataMaior.ano - dataMenor.ano;
-    int mes_diff = (dataMaior.mes - dataMenor.mes) + 12 * ano_diff;
+    int ano_diff = data_maior.ano - data_menor.ano;
+    int mes_diff = (data_maior.mes - data_menor.mes) + 12 * ano_diff;
     int dias_diff = 0;
 
     for (int i = 0; i < mes_diff; i++) {
-        int indice_mes = (dataMenor.mes - 1 + i) % 12;
+        int indice_mes = (data_menor.mes - 1 + i) % 12;
 
         dias_diff += dias_por_mes[indice_mes];
     }
 
-    dias_diff += dataMaior.dia - (dataMenor.dia - 1);
+    dias_diff += data_maior.dia - (data_menor.dia - 1);
  
     return dias_diff;
 }
@@ -133,31 +133,31 @@ void alterar(Voo voos[], int qtd_voos, int numero_voo, float novo_valor) {
     'voos'.
 */
 void planejar(Voo voos[], int qtd_voos, Data data_inicio, Data data_fim, char codigo_origem[]) {
-    int numeroVooIda, numeroVooVolta;
-    float menorSomaValores = -1.0;
+    int numero_voo_ida, numero_voo_volta;
+    float menor_soma_valores = -1.0;
 
     for (int i = 0; i < qtd_voos; i++) {
-        Voo vooIda = voos[i];
+        Voo voo_ida = voos[i];
 
-        if (strcmp(vooIda.origem, codigo_origem) == 0 &&
-            compara_data(vooIda.data, data_inicio) >= 0 &&
-            compara_data(vooIda.data, data_fim) < 0) {
+        if (strcmp(voo_ida.origem, codigo_origem) == 0 &&
+            compara_data(voo_ida.data, data_inicio) >= 0 &&
+            compara_data(voo_ida.data, data_fim) < 0) {
 
             for (int j = 0; j < qtd_voos; j++) {
-                Voo vooVolta = voos[j];
+                Voo voo_volta = voos[j];
 
-                if (strcmp(vooVolta.destino, codigo_origem) == 0 && 
-                    diferenca_data(vooIda.data, vooVolta.data) >= 4 &&
-                    compara_data(vooIda.data, vooVolta.data) < 0 &&
-                    compara_data(vooVolta.data, data_fim) <= 0 &&
-                    compara_data(vooVolta.data, data_inicio) > 0) {
+                if (strcmp(voo_volta.destino, codigo_origem) == 0 && 
+                    diferenca_data(voo_ida.data, voo_volta.data) >= 4 &&
+                    compara_data(voo_ida.data, voo_volta.data) < 0 &&
+                    compara_data(voo_volta.data, data_fim) <= 0 &&
+                    compara_data(voo_volta.data, data_inicio) > 0) {
                         
-                    float somaAux = vooIda.valor + vooVolta.valor;
+                    float somaAux = voo_ida.valor + voo_volta.valor;
 
-                    if (menorSomaValores < 0 || somaAux < menorSomaValores) {
-                        menorSomaValores = somaAux;
-                        numeroVooIda = vooIda.numero;
-                        numeroVooVolta = vooVolta.numero;
+                    if (menor_soma_valores < 0 || somaAux < menor_soma_valores) {
+                        menor_soma_valores = somaAux;
+                        numero_voo_ida = voo_ida.numero;
+                        numero_voo_volta = voo_volta.numero;
                     }
                 }
             }
@@ -165,10 +165,10 @@ void planejar(Voo voos[], int qtd_voos, Data data_inicio, Data data_fim, char co
     }
 
     // imprime o número do voo de ida da viagem de menor custo
-    printf("%d\n", numeroVooIda);
+    printf("%d\n", numero_voo_ida);
 
     // imprime o número do voo de volta da viagem de menor custo
-    printf("%d\n", numeroVooVolta);
+    printf("%d\n", numero_voo_volta);
     
     return;
 }
