@@ -1,8 +1,6 @@
 typedef struct {
-    // você é livre pra definir o bloco aqui
+    int x, y, z, M;
 } Bloco;
-
-// é obrigatório implementar os protótipos seguintes
 
 /**
  * Cria uma matriz de altitudes representando
@@ -24,7 +22,23 @@ Bloco ***criarMundo(int m, int n, int **altitudes, int seed);
  **/
 double explorarMundo(
     Bloco ***mundo, int m, int n, int **altitudes, double tempoPorBloco,
-    int *qtdDiamante, int *qtdOuro, int *qtdFerro, int *qtdBlocos);
+    int *qtdDiamante, int *qtdOuro, int *qtdFerro, int *qtdBlocos
+);
 
-// você pode adicionar e implementar outros protótipos
-// que forem necessários
+/**
+ * Função que imprime as informações sobre quantidade de blocos, minérios e tempo
+ * total do mundo na saída padrão.
+ **/
+void imprimirInformacoes(int qtdBlocos, double tempoTotal, int qtdDiamante, int qtdOuro, int qtdFerro);
+
+/**
+ * Função responsável por liberar toda memória alocada dinamicamente na criação 
+ * de uma matriz de altitudes em um mundo de minecraft.
+ */
+void liberarAltitudes(int **altitudes, int m);
+
+/**
+ * Função responsável por liberar toda memória alocada dinamicamente na criação 
+ * de blocos em um mundo de minecraft.
+ */
+void liberarMundo(Bloco ***mundo, int m, int n);
