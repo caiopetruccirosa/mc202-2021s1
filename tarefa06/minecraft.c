@@ -3,6 +3,10 @@
 #include "minecraft.h"
 #define ALTURA_MAX 256
 
+/**
+ * Cria uma matriz de altitudes representando
+ * o relevo de um mundo.
+ **/
 int **calcularAltitudes(int m, int n, int seed) {
     int **altitudes = malloc(m * sizeof(int*));
 
@@ -17,6 +21,10 @@ int **calcularAltitudes(int m, int n, int seed) {
     return altitudes;
 }
 
+/**
+ * Cria um novo mundo representado por uma matriz
+ * de blocos alocada dinamicamente.
+ **/
 Bloco ***criarMundo(int m, int n, int **altitudes, int seed) {
     Bloco ***mundo = malloc(m * sizeof(Bloco**));
 
@@ -39,6 +47,12 @@ Bloco ***criarMundo(int m, int n, int **altitudes, int seed) {
     return mundo;
 }
 
+/**
+ * Explora o mapa de um mundo e devolve o tempo
+ * necessário para minerar todo ele. Além disso,
+ * devolve a quantidade de alguns minérios de
+ * interesse.
+ **/
 double explorarMundo(
     Bloco ***mundo, int m, int n, int **altitudes, double tempoPorBloco,
     int *qtdDiamante, int *qtdOuro, int *qtdFerro, int *qtdBloco
@@ -71,6 +85,10 @@ double explorarMundo(
     return tempoTotal;
 }
 
+/**
+ * Função que imprime as informações sobre quantidade de blocos, minérios e tempo
+ * total do mundo na saída padrão.
+ **/
 void imprimirInformacoes(int qtdBloco, double tempoTotal, int qtdDiamante, int qtdOuro, int qtdFerro) {
     printf("Total de Blocos: %d\n", qtdBloco);
     printf("Tempo total: %.2lfs\n", tempoTotal);
@@ -81,6 +99,10 @@ void imprimirInformacoes(int qtdBloco, double tempoTotal, int qtdDiamante, int q
     return;
 }
 
+/**
+ * Função responsável por liberar toda memória alocada dinamicamente na criação 
+ * de uma matriz de altitudes em um mundo de minecraft.
+ */
 void liberarAltitudes(int **altitudes, int m) {
     for (int x = 0; x < m; x++) {
         free(altitudes[x]);
@@ -91,6 +113,10 @@ void liberarAltitudes(int **altitudes, int m) {
     return;
 }
 
+/**
+ * Função responsável por liberar toda memória alocada dinamicamente na criação 
+ * de blocos em um mundo de minecraft.
+ */
 void liberarMundo(Bloco ***mundo, int m, int n) {
     for (int x = 0; x < m; x++) {
         for (int z = 0; z < n; z++) {
