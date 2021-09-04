@@ -54,7 +54,7 @@ double explorarMundo(
 
     for (int x = 0; x < m; x++) {
         for (int z = 0; z < n; z++) {
-            for (int y = 0; y < ALTURA_MAX; y++) {
+            for (int y = 0; y <= altitudes[x][z]; y++) {
                 Bloco bloco = mundo[x][z][y];
                 int tipo = bloco.M;
 
