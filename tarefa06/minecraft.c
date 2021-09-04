@@ -26,14 +26,8 @@ Bloco ***criarMundo(int m, int n, int **altitudes, int seed) {
         for (int z = 0; z < n; z++) {
             mundo[x][z] = malloc(ALTURA_MAX * sizeof(Bloco));
 
-            for (int y = 0; y < ALTURA_MAX; y++) {
-                int M;
-                
-                if (y > altitudes[x][z]) {
-                    M = 21;
-                } else {
-                    M = (seed * (202 + x + y + z) + x + y + z) % 33;
-                }
+            for (int y = 0; y <= altitudes[x][z]; y++) {
+                int M = (seed * (202 + x + y + z) + x + y + z) % 33;
 
                 Bloco bloco = { x, y, z, M };
 
