@@ -201,18 +201,9 @@ int encontrar_solucao(int **matriz, int n, int idx) {
     int i = (idx / (n - 2)) + 1;
     int j = (idx % (n - 2)) + 1;
 
-    /*
-    printf("Indice %d\n", idx);
-    printf("Valor do i %d\n", i);
-    printf("Valor do j %d\n", j);
-    */
-
     if (i < n - 1 && j < n - 1) {
         for (int v = 1; v < n - 1; v++) {
             matriz[i][j] = v;
-
-            //imprimir_matriz(matriz, n);
-            //printf("\n");
 
             if (eh_possibilidade_valida(matriz, n, i, j)) {
                 if (encontrar_solucao(matriz, n, idx + 1)) {
@@ -221,9 +212,6 @@ int encontrar_solucao(int **matriz, int n, int idx) {
             }
 
             matriz[i][j] = 0;
-
-            //imprimir_matriz(matriz, n);
-            //printf("\n");
         }
     }
 
@@ -243,5 +231,3 @@ int main() {
 
     return 0;
 }
-
-// se o numero de predio que tem que ver - (menos) o valor de uma celula < 0
