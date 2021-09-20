@@ -60,12 +60,39 @@ void imprimir_matriz(int **matriz, int n) {
 }
 
 /**
- * Função que verifica 
+ * Função que verifica se a linha é valida dado os valores da borda da mesma
+ * linha.
  */
-int eh_solucao_final(int **matriz, int n) {
-    for (int i = 1; i < n - 1; i++) {
-        for (int j = 1; j < n - 1; j++) {
-            if (matriz[i][j] == 0) {
+int eh_linha_valida(int **matriz, int n, int i) {
+    int cont, maior;
+
+    cont = maior = 0;
+    for (int j_aux = 1; j_aux < n - 1; j_aux++) {
+        if (matriz[i][j_aux] == 0) {
+            break;
+        }
+
+        if (matriz[i][j_aux] != 0 && maior < matriz[i][j_aux]) {
+            cont++;
+            maior = matriz[i][j_aux];
+
+            if (cont > matriz[i][0]) {
+                return 0;
+            }
+        }
+    }
+
+    cont = maior = 0;
+    for (int j_aux = n - 2; j_aux > 0; j_aux--) {
+        if (matriz[i][j_aux] == 0) {
+            break;
+        }
+
+        if (matriz[i][j_aux] != 0 && maior < matriz[i][j_aux]) {
+            cont++;
+            maior = matriz[i][j_aux];
+
+            if (cont > matriz[i][n-1]) {
                 return 0;
             }
         }
@@ -74,68 +101,91 @@ int eh_solucao_final(int **matriz, int n) {
     return 1;
 }
 
-int eh_valor_valido(int **matriz, int n, int i, int j) {   
+/**
+ * Função que verifica se a coluna é valida dado os valores da borda da mesma
+ * coluna.
+ */
+int eh_coluna_valida(int **matriz, int n, int j) {
+    int cont, maior;
+
+    cont = maior = 0;
+    for (int i_aux = 1; i_aux < n - 1; i_aux++) {
+        if (matriz[i_aux][j] == 0) {
+            break;
+        }
+
+        if (matriz[i_aux][j] != 0 && maior < matriz[i_aux][j]) {
+            cont++;
+            maior = matriz[i_aux][j];
+
+            if (cont > matriz[0][j]) {
+                return 0;
+            }
+        }
+    }
+
+    cont = maior = 0;
+    for (int i_aux = n - 2; i_aux > 0; i_aux--) {
+        if (matriz[i_aux][j] == 0) {
+            break;
+        }
+        
+        if (matriz[i_aux][j] != 0 && maior < matriz[i_aux][j]) {
+            cont++;
+            maior = matriz[i_aux][j];
+
+            if (cont > matriz[n-1][j]) {
+                return 0;
+            }
+        }
+    }
+
+    return 1;
+}
+
+/**
+ * Função que verifica se a possibilidade com o valor colocado na posição (i, j)
+ * é valida, tomando em conta as regras do quebra-cabeça.
+ */
+int eh_possibilidade_valida(int **matriz, int n, int i, int j) {  
+    // Verifica se um elemento da linha repete
     for (int i_aux = 1; i_aux < n - 1; i_aux++) {
         if (i != i_aux && matriz[i_aux][j] == matriz[i][j]) {
             return 0;
         }
     }
 
+    // Verifica se um elemento da coluna repete
     for (int j_aux = 1; j_aux < n - 1; j_aux++) {
         if (j != j_aux && matriz[i][j_aux] == matriz[i][j]) {
             return 0;
         }
     }
 
-    int cont = 0;
-    int max_v = -1;
-    for (int j_aux = 1; j_aux < n - 1; j_aux++) {
-        if (max_v < matriz[i][j_aux]) {
-            cont += 1;
-            max_v = matriz[i][j_aux];
-        }
-
-        if (cont > matriz[i][0]) {
-            return 0;
-        }
+    // Verifica se a linha é valida dado os valores da borda
+    if (!eh_linha_valida(matriz, n, i)) {
+        return 0;
     }
 
-    cont = 0;
-    max_v = -1;
-    for (int j_aux = n - 2; j_aux > 0; j_aux--) {
-        if (max_v < matriz[i][j_aux]) {
-            cont += 1;
-            max_v = matriz[i][j_aux];
-        }
-
-        if (cont > matriz[i][n-1]) {
-            return 0;
-        }
+    // Verifica se a coluna é valida dado os valores da borda
+    if (!eh_coluna_valida(matriz, n, j)) {
+        return 0;
     }
 
-    cont = 0;
-    max_v = -1;
-    for (int i_aux = 1; i_aux < n - 1; i_aux++) {
-        if (max_v < matriz[i_aux][j]) {
-            cont += 1;
-            max_v = matriz[i_aux][j];
-        }
+    return 1;
+}
 
-        if (cont > matriz[0][j]) {
-            return 0;
-        }
-    }
-
-    cont = 0;
-    max_v = -1;
-    for (int i_aux = n - 2; i_aux > 0; i_aux--) {
-        if (max_v < matriz[i_aux][j]) {
-            cont += 1;
-            max_v = matriz[i_aux][j];
-        }
-
-        if (cont > matriz[n-1][j]) {
-            return 0;
+/**
+ * Função que verifica se a matriz contêm a solução do problema verificando se 
+ * existe algum 0 restante na matriz, caso contrário, toma a solução como válida,
+ * já que apenas valores válidos são mantidos na matriz anteriormente.
+ */
+int eh_solucao(int **matriz, int n) {
+    for (int i = 1; i < n - 1; i++) {
+        for (int j = 1; j < n - 1; j++) {
+            if (matriz[i][j] == 0) {
+                return 0;
+            }
         }
     }
 
@@ -148,26 +198,36 @@ int eh_valor_valido(int **matriz, int n, int i, int j) {
  * ser 0 ou 1, indicando se existe solução para o quebra-cabeça ou não.
  */
 int encontrar_solucao(int **matriz, int n, int idx) {
-    if (eh_solucao_final(matriz, n)) {
-        return 1;
-    }
-
     int i = (idx / (n - 2)) + 1;
     int j = (idx % (n - 2)) + 1;
 
+    /*
+    printf("Indice %d\n", idx);
+    printf("Valor do i %d\n", i);
+    printf("Valor do j %d\n", j);
+    */
+
     if (i < n - 1 && j < n - 1) {
-        for (int v = 1; v <= n; v++) {
+        for (int v = 1; v < n - 1; v++) {
             matriz[i][j] = v;
 
-            if (eh_valor_valido(matriz, n, i, j) && encontrar_solucao(matriz, n, idx++)) {
-                return 1;
+            //imprimir_matriz(matriz, n);
+            //printf("\n");
+
+            if (eh_possibilidade_valida(matriz, n, i, j)) {
+                if (encontrar_solucao(matriz, n, idx + 1)) {
+                    return 1;
+                }
             }
 
             matriz[i][j] = 0;
+
+            //imprimir_matriz(matriz, n);
+            //printf("\n");
         }
     }
 
-    return 0;
+    return eh_solucao(matriz, n);
 }
 
 
@@ -183,3 +243,5 @@ int main() {
 
     return 0;
 }
+
+// se o numero de predio que tem que ver - (menos) o valor de uma celula < 0
