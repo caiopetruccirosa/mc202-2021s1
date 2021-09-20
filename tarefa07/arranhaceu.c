@@ -68,6 +68,7 @@ int eh_linha_valida(int **matriz, int n, int i) {
 
     cont_ida = maior_ida = cont_volta = maior_volta = 0;
     for (int j = 1; j < n - 1; j++) {
+        // Caso exista algum 0 na linha, considera ela válida por enquanto
         if (matriz[i][j] == 0) {
             return 1;
         }
@@ -102,6 +103,7 @@ int eh_coluna_valida(int **matriz, int n, int j) {
 
     cont_ida = maior_ida = cont_volta = maior_volta = 0;
     for (int i = 1; i < n - 1; i++) {
+        // Caso exista algum 0 na coluna, considera ela válida por enquanto
         if (matriz[i][j] == 0) {
             return 1;
         }
@@ -141,12 +143,12 @@ int eh_possibilidade_valida(int **matriz, int n, int i, int j) {
         }
     }
 
-    // Verifica se a linha é valida dado os valores da borda
+    // Verifica se a linha é valida dado os valores da borda (regra do quebra-cabeça)
     if (!eh_linha_valida(matriz, n, i)) {
         return 0;
     }
 
-    // Verifica se a coluna é valida dado os valores da borda
+    // Verifica se a coluna é valida dado os valores da borda (regra do quebra-cabeça)
     if (!eh_coluna_valida(matriz, n, j)) {
         return 0;
     }
@@ -177,22 +179,27 @@ int eh_solucao(int **matriz, int n) {
  * ser 0 ou 1, indicando se existe solução para o quebra-cabeça ou não.
  */
 int encontrar_solucao(int **matriz, int n, int idx) {
+    // Mapeia o índice sequencial 'idx' para as coordenadas da matriz i e j, levando
+    // em conta as bordas, que são os índices 0 e n - 1
     int i = (idx / (n - 2)) + 1;
     int j = (idx % (n - 2)) + 1;
 
-    if (i < n - 1 && j < n - 1) {
-        for (int v = 1; v < n - 1; v++) {
-            matriz[i][j] = v;
-            
-            if (eh_possibilidade_valida(matriz, n, i, j) && encontrar_solucao(matriz, n, idx + 1)) {
-                return 1;
-            }
-
-            matriz[i][j] = 0;
-        }
+    // Caso o índice esteja fora da matriz, percorremos ela por completo
+    if (i > n - 2 || j > n - 2) {
+        return eh_solucao(matriz, n);
     }
 
-    return eh_solucao(matriz, n);
+    for (int v = 1; v < n - 1; v++) {
+        matriz[i][j] = v;
+        
+        if (eh_possibilidade_valida(matriz, n, i, j) && encontrar_solucao(matriz, n, idx + 1)) {
+            return 1;
+        }
+
+        matriz[i][j] = 0;
+    }
+
+    return 0;
 }
 
 
