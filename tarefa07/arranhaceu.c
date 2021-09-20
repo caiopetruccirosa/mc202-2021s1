@@ -64,38 +64,30 @@ void imprimir_matriz(int **matriz, int n) {
  * linha.
  */
 int eh_linha_valida(int **matriz, int n, int i) {
-    int cont, maior;
+    int cont_ida, maior_ida, cont_volta, maior_volta;
 
-    cont = maior = 0;
-    for (int j_aux = 1; j_aux < n - 1; j_aux++) {
-        if (matriz[i][j_aux] == 0) {
-            break;
+    cont_ida = maior_ida = cont_volta = maior_volta = 0;
+    for (int j = 1; j < n - 1; j++) {
+        if (matriz[i][j] == 0) {
+            return 1;
+        }
+        
+        int j_ida = j;
+        int j_volta = (n - 1) - j;
+
+        if (maior_ida < matriz[i][j_ida]) {
+            cont_ida++;
+            maior_ida = matriz[i][j_ida];
         }
 
-        if (matriz[i][j_aux] != 0 && maior < matriz[i][j_aux]) {
-            cont++;
-            maior = matriz[i][j_aux];
-
-            if (cont > matriz[i][0]) {
-                return 0;
-            }
+        if (maior_volta < matriz[i][j_volta]) {
+            cont_volta++;
+            maior_volta = matriz[i][j_volta];
         }
     }
 
-    cont = maior = 0;
-    for (int j_aux = n - 2; j_aux > 0; j_aux--) {
-        if (matriz[i][j_aux] == 0) {
-            break;
-        }
-
-        if (matriz[i][j_aux] != 0 && maior < matriz[i][j_aux]) {
-            cont++;
-            maior = matriz[i][j_aux];
-
-            if (cont > matriz[i][n-1]) {
-                return 0;
-            }
-        }
+    if (cont_ida != matriz[i][0] || cont_volta != matriz[i][n-1]) {
+        return 0;
     }
 
     return 1;
@@ -106,38 +98,30 @@ int eh_linha_valida(int **matriz, int n, int i) {
  * coluna.
  */
 int eh_coluna_valida(int **matriz, int n, int j) {
-    int cont, maior;
+    int cont_ida, maior_ida, cont_volta, maior_volta;
 
-    cont = maior = 0;
-    for (int i_aux = 1; i_aux < n - 1; i_aux++) {
-        if (matriz[i_aux][j] == 0) {
-            break;
+    cont_ida = maior_ida = cont_volta = maior_volta = 0;
+    for (int i = 1; i < n - 1; i++) {
+        if (matriz[i][j] == 0) {
+            return 1;
         }
 
-        if (matriz[i_aux][j] != 0 && maior < matriz[i_aux][j]) {
-            cont++;
-            maior = matriz[i_aux][j];
+        int i_ida = i;
+        int i_volta = (n - 1) - i;
 
-            if (cont > matriz[0][j]) {
-                return 0;
-            }
+        if (maior_ida < matriz[i_ida][j]) {
+            cont_ida++;
+            maior_ida = matriz[i_ida][j];
+        }
+
+        if (maior_volta < matriz[i_volta][j]) {
+            cont_volta++;
+            maior_volta = matriz[i_volta][j];
         }
     }
 
-    cont = maior = 0;
-    for (int i_aux = n - 2; i_aux > 0; i_aux--) {
-        if (matriz[i_aux][j] == 0) {
-            break;
-        }
-        
-        if (matriz[i_aux][j] != 0 && maior < matriz[i_aux][j]) {
-            cont++;
-            maior = matriz[i_aux][j];
-
-            if (cont > matriz[n-1][j]) {
-                return 0;
-            }
-        }
+    if (cont_ida != matriz[0][j] || cont_volta != matriz[n-1][j]) {
+        return 0;
     }
 
     return 1;
@@ -148,16 +132,11 @@ int eh_coluna_valida(int **matriz, int n, int j) {
  * é valida, tomando em conta as regras do quebra-cabeça.
  */
 int eh_possibilidade_valida(int **matriz, int n, int i, int j) {  
-    // Verifica se um elemento da linha repete
-    for (int i_aux = 1; i_aux < n - 1; i_aux++) {
-        if (i != i_aux && matriz[i_aux][j] == matriz[i][j]) {
-            return 0;
-        }
-    }
+    // Verifica se o elemento repete na linha ou na coluna
+    for (int k = 1; k < n - 1; k++) {
+        int v = matriz[i][j];
 
-    // Verifica se um elemento da coluna repete
-    for (int j_aux = 1; j_aux < n - 1; j_aux++) {
-        if (j != j_aux && matriz[i][j_aux] == matriz[i][j]) {
+        if ((i != k && matriz[k][j] == v) || (j != k && matriz[i][k] == v)) {
             return 0;
         }
     }
@@ -204,11 +183,9 @@ int encontrar_solucao(int **matriz, int n, int idx) {
     if (i < n - 1 && j < n - 1) {
         for (int v = 1; v < n - 1; v++) {
             matriz[i][j] = v;
-
-            if (eh_possibilidade_valida(matriz, n, i, j)) {
-                if (encontrar_solucao(matriz, n, idx + 1)) {
-                    return 1;
-                }
+            
+            if (eh_possibilidade_valida(matriz, n, i, j) && encontrar_solucao(matriz, n, idx + 1)) {
+                return 1;
             }
 
             matriz[i][j] = 0;
