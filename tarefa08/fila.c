@@ -22,6 +22,8 @@ void destruir_fila(Fila *fila) {
         no = prox;
     }
 
+    free(fila);
+
     return;
 }
 
