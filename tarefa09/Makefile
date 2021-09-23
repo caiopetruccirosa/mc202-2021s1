@@ -5,8 +5,14 @@ LDFLAGS = -lm
 
 all: equipes
 
-equipes: equipes.c
-	gcc $(CFLAGS) *.c -o equipes $(LDFLAGS)
+equipes: equipes.o lista.o
+	gcc $(CFLAGS) equipes.o lista.o -o equipes $(LDFLAGS)
+
+equipes.o: equipes.c
+	gcc $(CFLAGS) -c equipes.c
+
+lista.o: lista.c
+	gcc $(CFLAGS) -c lista.c
 
 clean:
-	rm -f equipes
+	rm -f equipes equipes.o lista.o
