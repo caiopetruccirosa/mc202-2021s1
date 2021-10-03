@@ -5,8 +5,17 @@ LDFLAGS = -lm
 
 all: docas
 
-docas: docas.c
-	gcc $(CFLAGS) *.c -o docas $(LDFLAGS)
+docas: docas.o pilha.o fila.o
+	gcc $(CFLAGS) docas.o pilha.o fila.o -o docas $(LDFLAGS)
+
+docas.o: docas.c
+	gcc $(CFLAGS) -c docas.c
+
+pilha.o: pilha.c
+	gcc $(CFLAGS) -c pilha.c
+
+fila.o: fila.c
+	gcc $(CFLAGS) -c fila.c
 
 clean:
-	rm -f docas
+	rm -f docas docas.o pilha.o fila.o
