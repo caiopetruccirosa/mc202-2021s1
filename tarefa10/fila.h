@@ -13,6 +13,7 @@ struct no {
 struct fila {
     No* inicio;
     No* fim;
+    int qtd;
 } typedef Fila;
 
 /**
@@ -37,23 +38,18 @@ void destruir_no(No *no);
  * Portanto, a estrutura foi alocada dinamicamente e é responsabilidade do usuário 
  * liberar a memória envolvida.
  */
-Fila *criar_fila();
+Fila criar_fila_navios();
 
 /**
  * Função responsável por liberar toda a memória que envolve a struct do tipo Fila, 
  * liberando a própria estrutura assim como todos os nós e os dados armazenados nela.
  */
-void destruir_fila(Fila *fila);
+void destruir_fila_navios(Fila fila);
 
 /**
- * Função que lê os dados de uma fila da entrada padrão (stdin).
+ * Função que lê os dados de uma fila de navios da entrada padrão (stdin).
  */
-Fila *ler_fila();
-
-/**
- * Função que imprime os dados de uma fila na saída padrão (stdout).
- */
-void imprimir_fila(Fila *fila);
+Fila ler_fila_navios(int numero_navios);
 
 /**
  * Função responsável por enfileirar um navio em uma fila.
@@ -70,3 +66,8 @@ void enfileirar(Fila *fila, Navio navio);
  * sendo armazenado.
  */
 Navio desenfileirar(Fila *fila);
+
+/**
+ * Função que retorna um valor booleano indicando se a fila está vazia.
+ */
+int eh_fila_vazia(Fila fila);

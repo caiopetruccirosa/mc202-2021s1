@@ -27,16 +27,17 @@ void destruir_no(No *no) {
     return;
 }
 
-Fila *criar_fila() {
-    Fila *fila = malloc(sizeof(Fila));
-    fila->inicio = NULL;
-    fila->fim = NULL;
+Fila criar_fila_navios() {
+    Fila fila = {};
+    fila.inicio = NULL;
+    fila.fim = NULL;
+    fila.qtd = 0;
 
     return fila;
 }
 
-void destruir_fila(Fila *fila) {
-    No *no = fila->inicio;
+void destruir_fila_navios(Fila fila) {
+    No *no = fila.inicio;
 
     while (no != NULL) {
         No *prox = no->proximo;
@@ -46,21 +47,24 @@ void destruir_fila(Fila *fila) {
         no = prox;
     }
 
-    free(fila);
-
     return;
 }
 
-Fila *ler_fila() {
-    Fila *fila = criar_fila();
+Fila ler_fila_navios(int numero_navios) {
+    Fila fila = criar_fila_navios();
+
+    for (int i = 0; i < numero_navios; i++) {
+        Navio navio = {};
+        scanf("%s %s %s %d", navio.nome, navio.objetivo, navio.tipo_mercadoria, &navio.carga);
+
+        enfileirar(&fila, navio);
+    }
 
     return fila;
 }
 
-void imprimir_fila(Fila *fila) {
-    // a implementar
-
-    return;
+int eh_fila_vazia(Fila fila) {
+    return fila.inicio == NULL && fila.fim == NULL;
 }
 
 void enfileirar(Fila *fila, Navio navio) {
@@ -72,6 +76,8 @@ void enfileirar(Fila *fila, Navio navio) {
         fila->fim->proximo = no;
         fila->fim = no;
     }
+
+    fila->qtd++;
 
     return;
 }
@@ -87,6 +93,7 @@ Navio desenfileirar(Fila *fila) {
     navio.carga = no->navio->carga;
     
     fila->inicio = fila->inicio->proximo;
+    fila->qtd--;
 
     destruir_no(no);
 
