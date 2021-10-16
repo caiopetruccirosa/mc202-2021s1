@@ -1,43 +1,24 @@
-struct conteiner {
-    char tipo_mercadoria[21];
-} typedef Conteiner;
+typedef char Mercadoria[21];
 
 struct pilha {
-    Conteiner *v;
+    Mercadoria *v;
     int topo;
     int capacidade;
 } typedef Pilha;
 
 /**
- * Função que cria um pilha de conteineres vazia, de capacidade passada por parâmetro.
+ * Função que cria um pilha vazia, de capacidade passada por parâmetro.
  */
 Pilha criar_pilha(int capacidade);
 
 /**
- * Função que empilha um conteiner em uma pilha
+ * Função que empilha um conteiner de mercadoria em uma pilha e retorna
+ * um valor booleano indicando se foi possível ou não empilhar.
  */
-void empilhar(Pilha *pilha, Conteiner conteiner);
+int empilhar(Pilha *pilha, Mercadoria m);
 
 /**
- * Função que desempilha um conteiner de uma pilha e retorna o valor do conteiner
- * desempilhado.
+ * Função que desempilha um conteiner de mercadoria em uma pillha e retorna
+ * um valor booleano indicando se foi possível ou não desempilhar.
  */
-Conteiner desempilhar(Pilha *pilha);
-
-/**
- * Função que retorna um valor booleano indicando se a pilha está cheia.
- */
-int eh_pilha_cheia(Pilha pilha);
-
-/**
- * Função que retorna um valor booleano indicando se a pilha está vazia.
- */
-int eh_pilha_vazia(Pilha pilha);
-
-
-void imprimir_pilha(Pilha pilha);
-
-/**
- * 
- */
-int pode_carregar(Pilha pilha, char tipo_mercadoria[]);
+int desempilhar(Pilha *pilha);

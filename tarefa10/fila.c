@@ -63,10 +63,6 @@ Fila ler_fila_navios(int numero_navios) {
     return fila;
 }
 
-int eh_fila_vazia(Fila fila) {
-    return fila.inicio == NULL && fila.fim == NULL;
-}
-
 void enfileirar(Fila *fila, Navio navio) {
     No *no = criar_no(navio);
 
@@ -92,7 +88,12 @@ Navio desenfileirar(Fila *fila) {
     strcpy(navio.tipo_mercadoria, no->navio->tipo_mercadoria);
     navio.carga = no->navio->carga;
     
-    fila->inicio = fila->inicio->proximo;
+    if (fila->inicio == fila->fim) {
+        fila->inicio = fila->fim = NULL;
+    } else {
+        fila->inicio = fila->inicio->proximo;
+    }
+
     fila->qtd--;
 
     destruir_no(no);

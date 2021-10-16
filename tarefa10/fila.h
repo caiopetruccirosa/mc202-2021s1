@@ -66,8 +66,3 @@ void enfileirar(Fila *fila, Navio navio);
  * sendo armazenado.
  */
 Navio desenfileirar(Fila *fila);
-
-/**
- * Função que retorna um valor booleano indicando se a fila está vazia.
- */
-int eh_fila_vazia(Fila fila);
