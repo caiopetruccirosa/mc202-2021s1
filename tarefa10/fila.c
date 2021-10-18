@@ -6,6 +6,9 @@
 
 No *criar_no(Navio n) {    
     Navio *navio = malloc(sizeof(Navio));
+    if (navio == NULL) {
+        exit(1);
+    }
     
     strcpy(navio->nome, n.nome);
     strcpy(navio->objetivo, n.objetivo);
@@ -13,6 +16,9 @@ No *criar_no(Navio n) {
     navio->carga = n.carga;
 
     No *no = malloc(sizeof(No));
+    if (no == NULL) {
+        exit(1);
+    }
 
     no->navio = navio;
     no->proximo = NULL;

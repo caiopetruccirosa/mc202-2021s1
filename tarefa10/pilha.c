@@ -7,6 +7,10 @@ Pilha criar_pilha(int capacidade) {
     Pilha pilha = {};
     
     pilha.v = malloc(capacidade * sizeof(Mercadoria));
+    if (pilha.v == NULL) {
+        exit(1);
+    }
+
     pilha.capacidade = capacidade;
     pilha.topo = -1;
 

@@ -18,6 +18,9 @@ void imprimir_operacao(char nome[], char tipo_operacao[], char tipo_mercadoria[]
  */
 Pilha *criar_docas(int numero_docas, int capacidade_doca) {
     Pilha *docas = malloc(numero_docas * sizeof(Pilha));
+    if (docas == NULL) {
+        exit(1);
+    }
 
     for (int i = 0; i < numero_docas; i++) {
         docas[i] = criar_pilha(capacidade_doca);
