@@ -3,42 +3,69 @@
 #include <string.h>
 #include "dominios.h"
 
+/****************** Funções Internas ******************/
+
 /**
  * Função que cria um nó baseado em uma struct de Dominio passada como
  * parâmetro.
  * 
  * Essa função aloca memória dinamicamente e deve ser liberada posteriormente.
  */
-No *criar_no(Dominio dominio) {
-    No *no = malloc(sizeof(No));
+No_Dominio *criar_no_dominio(Dominio dominio);
+
+/**
+ * Função que calcula e retorna o valor da altura da árvore, partindo de sua raiz.
+ */
+int altura_dominio(Arvore_Dominio raiz);
+
+/**
+ * Função que calcula o fator de balanceamento de uma árvore.
+ */
+int fator_balanceamento_dominio(Arvore_Dominio raiz);
+
+/**
+ * 
+ */
+void rotacao_esquerda_dominio(Arvore_Dominio *raiz);
+
+/**
+ * 
+ */
+void rotacao_direita_dominio(Arvore_Dominio *raiz);
+
+/**
+ * 
+ */
+void rotacao_esquerda_direita_dominio(Arvore_Dominio *raiz);
+
+/**
+ * 
+ */
+void rotacao_direita_esquerda_dominio(Arvore_Dominio *raiz);
+
+/******************************************************/
+
+No_Dominio *criar_no_dominio(Dominio dominio) {
+    No_Dominio *no = malloc(sizeof(No_Dominio));
     
     if (no == NULL) exit(1);
 
     no->esquerda = no->direita = NULL;
+    no->altura = 0;
     no->dominio = dominio;
     
     return no;
 }
 
-/**
- * Função que lê os dados de um domínio (nome do domínio e o seu IP)
- * a partir da entrada padrão e retorna uma struct contendo os dados.
- */
 Dominio ler_dominio() {
     Dominio dominio;
-
     scanf("%s %s", dominio.nome, dominio.ip);
-    dominio.vezes_consultadas = 0;
     
     return dominio;
 }
 
-/**
- * Função que lê uma ABB de domínios a partir da entrada padrão e
- * retorna um ponteiro para o nó raiz da árvore.
- */
-No *ler_dominios(int n) {
-    No *raiz = NULL;
+Arvore_Dominio ler_dominios(int n) {
+    Arvore_Dominio raiz = NULL;
 
     for (int i = 0; i < n; i++) {
         Dominio dominio = ler_dominio();
@@ -48,67 +75,99 @@ No *ler_dominios(int n) {
     return raiz;
 }
 
-/**
- * Função que calcula a altura de uma ABB a partir de uma raiz passada.
- */
-int calcular_altura(No *raiz) {
-    if (raiz == NULL) {
-        return 0;
-    }
+int altura_dominio(Arvore_Dominio raiz) {
+    if (raiz == NULL) return -1;
+    if (raiz->esquerda == NULL && raiz->direita == NULL) return 0;
 
-    int altura_esquerda = calcular_altura(raiz->esquerda);
-    int altura_direita = calcular_altura(raiz->direita);
-
-    if (altura_esquerda > altura_direita) {
-        return altura_esquerda + 1;
+    int maior_altura;
+    if (raiz->esquerda == NULL) {
+        maior_altura = raiz->direita->altura;
+    } else if (raiz->direita == NULL) {
+        maior_altura = raiz->esquerda->altura;
+    } else if (raiz->esquerda->altura > raiz->direita->altura) {
+        maior_altura = raiz->esquerda->altura;
     } else {
-        return altura_direita + 1;
+        maior_altura = raiz->direita->altura;
     }
+
+    return maior_altura + 1;
 }
 
-/**
- * Função que balanceia uma subABB a partir do ponteiro para a sua raiz
- * passado como parâmetro.
- */
-void balancear_subarvore(No *raiz) {
-    if (raiz == NULL) return;
-    
+int fator_balanceamento_dominio(Arvore_Dominio raiz) {
+    return (raiz != NULL) ? altura_dominio(raiz->esquerda) - altura_dominio(raiz->direita) : 0;
+}
+
+void rotacao_esquerda_dominio(Arvore_Dominio *raiz) {
+    No_Dominio *raiz_antiga = *raiz;
+    *raiz = (*raiz)->direita;
+    raiz_antiga->direita = (*raiz)->esquerda;
+    (*raiz)->esquerda = raiz_antiga;
+
+    raiz_antiga->altura = altura_dominio(raiz_antiga);
+    (*raiz)->altura = altura_dominio(*raiz);
+
     return;
 }
 
-/**
- * Função que insere um domínio passado como parâmetro em uma ABB cuja
- * raiz deve ser passada por parâmetro como um ponteiro de ponteiro, sendo
- * uma referência para o ponteiro da raiz.
- * 
- * Essa função aloca memória dinamicamente para expansão da ABB,
- * que deve ser liberada depois.
- */
-void inserir_dominio(No **raiz, Dominio dominio) {
-    if (raiz == NULL) return;
+void rotacao_direita_dominio(Arvore_Dominio *raiz) {
+    No_Dominio *raiz_antiga = *raiz;
+    *raiz = (*raiz)->esquerda;
+    raiz_antiga->esquerda = (*raiz)->direita;
+    (*raiz)->direita = raiz_antiga;
 
+    raiz_antiga->altura = altura_dominio(raiz_antiga);
+    (*raiz)->altura = altura_dominio(*raiz);
+
+    return;
+}
+
+void rotacao_esquerda_direita_dominio(Arvore_Dominio *raiz) {
+    rotacao_esquerda_dominio(&(*raiz)->esquerda);
+    rotacao_direita_dominio(raiz);
+    return;
+}
+ 
+void rotacao_direita_esquerda_dominio(Arvore_Dominio *raiz) {
+    rotacao_direita_dominio(&(*raiz)->direita);
+    rotacao_esquerda_dominio(raiz);
+    return;
+ }
+
+void inserir_dominio(Arvore_Dominio *raiz, Dominio dominio) {
     if (*raiz == NULL) {
-        *raiz = criar_no(dominio);
-    } else if (strcmp(dominio.nome, (*raiz)->dominio.nome) <= 0) {
+        *raiz = criar_no_dominio(dominio);
+    } else if (strcmp(dominio.nome, (*raiz)->dominio.nome) < 0) {
         inserir_dominio(&(*raiz)->esquerda, dominio);
     } else {
         inserir_dominio(&(*raiz)->direita, dominio);
     }
 
+    (*raiz)->altura = altura_dominio(*raiz);
+
+    // rotações
+    if (fator_balanceamento_dominio(*raiz) < -1) {
+        if (fator_balanceamento_dominio((*raiz)->direita) > 0) {
+            rotacao_direita_esquerda_dominio(raiz);
+        } else {
+            rotacao_esquerda_dominio(raiz);
+        }
+     } else if (fator_balanceamento_dominio(*raiz) > 1) {
+        if (fator_balanceamento_dominio((*raiz)->esquerda) < 0) {
+            rotacao_esquerda_direita_dominio(raiz);
+        } else {
+            rotacao_direita_dominio(raiz);
+        }
+    }
+
     return;
 }
 
-/**
- * Função que busca um domínio armazenado em uma ABB de domínios com
- * base no nome do domínio e retorna um ponteiro para o domínio.
- * Deve ser passado a raiz da árvore onde a busca será realizada e o
- * domínio como uma string.
- */
-Dominio *buscar_dominio(No *raiz, char dominio[101]) {
-    if (raiz == NULL) return NULL;
+Dominio *buscar_dominio(Arvore_Dominio raiz, char dominio[101]) {
+    if (raiz == NULL) {
+        return NULL;
+    }
 
     int comparacao = strcmp(dominio, raiz->dominio.nome);
-
     if (comparacao == 0) {
         return &raiz->dominio;
     } else if (comparacao < 0) {
@@ -118,16 +177,13 @@ Dominio *buscar_dominio(No *raiz, char dominio[101]) {
     }
 }
 
-/**
- * Função que libera toda a memória alocada dinamicamente existente
- * em uma ABB cuja raiz deve ser passada como parâmetro.
- */
-void destruir_dominios(No *raiz) {
-    if (raiz == NULL) return;
+void destruir_dominios(Arvore_Dominio raiz) {
+    if (raiz == NULL) {
+        return;
+    }
 
     destruir_dominios(raiz->esquerda);
     destruir_dominios(raiz->direita);
-    
     free(raiz);
 
     return;

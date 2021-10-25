@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "dominios.h"
+#include "usuarios.h"
 
 /**
  * Struct que armazena os dados de uma requisição, como o domínio
@@ -46,27 +47,28 @@ int main() {
     int u, n, m;
 
     scanf("%d %d", &u, &n);
-    No *dominios = ler_dominios(n);
+    Arvore_Dominio dominios = ler_dominios(n);
 
     scanf("%d", &m);
     Requisicao *requisicoes = ler_requisicoes(m);
 
+    Arvore_Usuario usuarios = NULL;
     for (int i = 0; i < m; i++) {
-        Dominio *dominio = buscar_dominio(dominios, requisicoes->dominio);
-        if (dominio != NULL) {
-            dominio->vezes_consultadas++;
-        }
-
-        if (dominio == NULL) {
-            printf("NOTFOUND %s FROM %s\n", requisicoes->dominio, requisicoes->ip_usuario);
-        } else if (dominio->vezes_consultadas < u) {
-            printf("ACCEPTED %s FROM %s RESPOND %s\n", requisicoes->dominio, requisicoes->ip_usuario, dominio->ip);
+        if (contabilizar_requisicao(&usuarios, requisicoes[i].ip_usuario, u)) {
+            Dominio *dominio = buscar_dominio(dominios, requisicoes[i].dominio);
+            
+            if (dominio != NULL) {
+                printf("ACCEPTED %s FROM %s RESPOND %s\n", requisicoes[i].dominio, requisicoes[i].ip_usuario, dominio->ip);
+            } else {
+                printf("NOTFOUND %s FROM %s\n", requisicoes[i].dominio, requisicoes[i].ip_usuario);
+            }
         } else {
-            printf("FORBIDDEN %s FROM %s RESPOND %s\n", requisicoes->dominio, requisicoes->ip_usuario, dominio->ip);
+            printf("FORBIDDEN %s FROM %s\n", requisicoes[i].dominio, requisicoes[i].ip_usuario);
         }
     }
 
     destruir_dominios(dominios);
+    destruir_usuarios(usuarios);
     free(requisicoes);
 
     return 0;

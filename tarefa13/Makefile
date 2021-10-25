@@ -5,8 +5,8 @@ LDFLAGS = -lm
 
 all: dns
 
-dns: dns.o dominios.o
-	gcc $(CFLAGS) dns.o dominios.o -o dns $(LDFLAGS)
+dns: dns.o dominios.o usuarios.o
+	gcc $(CFLAGS) dns.o dominios.o usuarios.o -o dns $(LDFLAGS)
 
 dns.o: dns.c
 	gcc $(CFLAGS) -c dns.c
@@ -14,11 +14,8 @@ dns.o: dns.c
 dominios.o: dominios.c
 	gcc $(CFLAGS) -c dominios.c
 
-test-example: dns
-	./dns < testes/example.in
-
-test-all: dns
-	python3 testar.py
+usuarios.o: usuarios.c
+	gcc $(CFLAGS) -c usuarios.c
 
 clean:
-	rm -f dns dns.o dominios.o
+	rm -f dns dns.o dominios.o usuarios.o
