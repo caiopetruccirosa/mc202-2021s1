@@ -9,7 +9,7 @@
  * Função que cria um nó baseado em uma struct de Dominio passada como
  * parâmetro.
  * 
- * Essa função aloca memória dinamicamente e deve ser liberada posteriormente.
+ * Essa função aloca memória dinamicamente que deve ser liberada posteriormente.
  */
 No_Dominio *criar_no_dominio(Dominio dominio);
 
@@ -24,24 +24,16 @@ int altura_dominio(Arvore_Dominio raiz);
 int fator_balanceamento_dominio(Arvore_Dominio raiz);
 
 /**
- * 
+ * Função que faz a rotação para esquerda de um nó raiz de uma árvore de
+ * domínios.
  */
-void rotacao_esquerda_dominio(Arvore_Dominio *raiz);
+void rotacao_esquerda_usuario(Arvore_Dominio *raiz);
 
 /**
- * 
+ * Função que faz a rotação para direita de um nó raiz de uma árvore de
+ * domínios.
  */
-void rotacao_direita_dominio(Arvore_Dominio *raiz);
-
-/**
- * 
- */
-void rotacao_esquerda_direita_dominio(Arvore_Dominio *raiz);
-
-/**
- * 
- */
-void rotacao_direita_esquerda_dominio(Arvore_Dominio *raiz);
+void rotacao_direita_usuario(Arvore_Dominio *raiz);
 
 /******************************************************/
 
@@ -121,18 +113,6 @@ void rotacao_direita_dominio(Arvore_Dominio *raiz) {
     return;
 }
 
-void rotacao_esquerda_direita_dominio(Arvore_Dominio *raiz) {
-    rotacao_esquerda_dominio(&(*raiz)->esquerda);
-    rotacao_direita_dominio(raiz);
-    return;
-}
- 
-void rotacao_direita_esquerda_dominio(Arvore_Dominio *raiz) {
-    rotacao_direita_dominio(&(*raiz)->direita);
-    rotacao_esquerda_dominio(raiz);
-    return;
- }
-
 void inserir_dominio(Arvore_Dominio *raiz, Dominio dominio) {
     if (*raiz == NULL) {
         *raiz = criar_no_dominio(dominio);
@@ -142,18 +122,21 @@ void inserir_dominio(Arvore_Dominio *raiz, Dominio dominio) {
         inserir_dominio(&(*raiz)->direita, dominio);
     }
 
+    // atualiza a altura do nó
     (*raiz)->altura = altura_dominio(*raiz);
 
-    // rotações
+    // faz as rotações necessárias para manter o balanceamento da árvore
     if (fator_balanceamento_dominio(*raiz) < -1) {
         if (fator_balanceamento_dominio((*raiz)->direita) > 0) {
-            rotacao_direita_esquerda_dominio(raiz);
+            rotacao_direita_dominio(&(*raiz)->direita);
+            rotacao_esquerda_dominio(raiz);
         } else {
             rotacao_esquerda_dominio(raiz);
         }
      } else if (fator_balanceamento_dominio(*raiz) > 1) {
         if (fator_balanceamento_dominio((*raiz)->esquerda) < 0) {
-            rotacao_esquerda_direita_dominio(raiz);
+            rotacao_esquerda_dominio(&(*raiz)->esquerda);
+            rotacao_direita_dominio(raiz);
         } else {
             rotacao_direita_dominio(raiz);
         }

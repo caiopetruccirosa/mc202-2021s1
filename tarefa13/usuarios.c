@@ -5,29 +5,33 @@
 /****************** Funções Internas ******************/
 
 /**
- * 
+ * Função que cria um nó com os dados de um usuário cujo IP é passado
+ * como parâmetro. A função aloca memória dinamicamente para a criação do
+ * nó, portanto, a memória deve ser liberada posteriormente.
  */
 No_Usuario *criar_no_usuario(char ip[16]);
 
 /**
- * 
+ * Função que calcula a altura de uma árvore, partindo de um nó raiz.
+ */
+int altura_usuario(Arvore_Usuario raiz);
+
+/**
+ * Função que calcula o fator de balanceamento de um nó raiz de uma árvore.
+ */
+int fator_balanceamento_usuario(Arvore_Usuario raiz);
+
+/**
+ * Função que faz a rotação para esquerda de um nó raiz de uma árvore de
+ * usuário.
  */
 void rotacao_esquerda_usuario(Arvore_Usuario *raiz);
 
 /**
- * 
+ * Função que faz a rotação para direita de um nó raiz de uma árvore de
+ * usuário.
  */
 void rotacao_direita_usuario(Arvore_Usuario *raiz);
-
-/**
- * 
- */
-void rotacao_esquerda_direita_usuario(Arvore_Usuario *raiz);
-
-/**
- * 
- */
-void rotacao_direita_esquerda_usuario(Arvore_Usuario *raiz);
 
 /******************************************************/
 
@@ -90,18 +94,6 @@ void rotacao_direita_usuario(Arvore_Usuario *raiz) {
     return;
 }
 
-void rotacao_esquerda_direita_usuario(Arvore_Usuario *raiz) {
-    rotacao_esquerda_usuario(&(*raiz)->esquerda);
-    rotacao_direita_usuario(raiz);
-    return;
-}
- 
-void rotacao_direita_esquerda_usuario(Arvore_Usuario *raiz) {
-    rotacao_direita_usuario(&(*raiz)->direita);
-    rotacao_esquerda_usuario(raiz);
-    return;
- }
-
 int contabilizar_requisicao(Arvore_Usuario *raiz, char ip[16], int limite_requisicoes) {
     int foi_contabilizado;
     if (*raiz == NULL) {
@@ -121,18 +113,21 @@ int contabilizar_requisicao(Arvore_Usuario *raiz, char ip[16], int limite_requis
         foi_contabilizado = contabilizar_requisicao(&(*raiz)->direita, ip, limite_requisicoes);
     }
 
+    // atualiza a altura do nó
     (*raiz)->altura = altura_usuario(*raiz);
 
-    // rotações
+    // faz as rotações necessárias para manter o balanceamento da árvore
     if (fator_balanceamento_usuario(*raiz) < -1) {
         if (fator_balanceamento_usuario((*raiz)->direita) > 0) {
-            rotacao_direita_esquerda_usuario(raiz);
+            rotacao_direita_usuario(&(*raiz)->direita);
+            rotacao_esquerda_usuario(raiz);
         } else {
             rotacao_esquerda_usuario(raiz);
         }
      } else if (fator_balanceamento_usuario(*raiz) > 1) {
         if (fator_balanceamento_usuario((*raiz)->esquerda) < 0) {
-            rotacao_esquerda_direita_usuario(raiz);
+            rotacao_esquerda_usuario(&(*raiz)->esquerda);
+            rotacao_direita_usuario(raiz);
         } else {
             rotacao_direita_usuario(raiz);
         }
