@@ -128,16 +128,20 @@ void inserir_dominio(Arvore_Dominio *raiz, Dominio dominio) {
     // faz as rotações necessárias para manter o balanceamento da árvore
     if (fator_balanceamento_dominio(*raiz) < -1) {
         if (fator_balanceamento_dominio((*raiz)->direita) > 0) {
+            // é necessário fazer duas rotações
             rotacao_direita_dominio(&(*raiz)->direita);
             rotacao_esquerda_dominio(raiz);
         } else {
+            // é necessário fazer apenas uma rotação
             rotacao_esquerda_dominio(raiz);
         }
      } else if (fator_balanceamento_dominio(*raiz) > 1) {
         if (fator_balanceamento_dominio((*raiz)->esquerda) < 0) {
+            // é necessário fazer duas rotações
             rotacao_esquerda_dominio(&(*raiz)->esquerda);
             rotacao_direita_dominio(raiz);
         } else {
+            // é necessário fazer apenas uma rotação
             rotacao_direita_dominio(raiz);
         }
     }

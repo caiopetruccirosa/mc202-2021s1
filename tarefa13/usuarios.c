@@ -95,7 +95,10 @@ void rotacao_direita_usuario(Arvore_Usuario *raiz) {
 }
 
 int contabilizar_requisicao(Arvore_Usuario *raiz, char ip[16], int limite_requisicoes) {
+    // valor booleano que indica se a requisição foi contabilizada ou não, ou seja
+    // indica se o usuário já passou do número de requisições limite para o servidor
     int foi_contabilizado;
+    
     if (*raiz == NULL) {
         *raiz = criar_no_usuario(ip);
         (*raiz)->qtd_requisicoes++;
@@ -119,16 +122,20 @@ int contabilizar_requisicao(Arvore_Usuario *raiz, char ip[16], int limite_requis
     // faz as rotações necessárias para manter o balanceamento da árvore
     if (fator_balanceamento_usuario(*raiz) < -1) {
         if (fator_balanceamento_usuario((*raiz)->direita) > 0) {
+            // é necessário fazer duas rotações
             rotacao_direita_usuario(&(*raiz)->direita);
             rotacao_esquerda_usuario(raiz);
         } else {
+            // é necessário fazer apenas uma rotação
             rotacao_esquerda_usuario(raiz);
         }
      } else if (fator_balanceamento_usuario(*raiz) > 1) {
         if (fator_balanceamento_usuario((*raiz)->esquerda) < 0) {
+            // é necessário fazer duas rotações
             rotacao_esquerda_usuario(&(*raiz)->esquerda);
             rotacao_direita_usuario(raiz);
         } else {
+            // é necessário fazer apenas uma rotação
             rotacao_direita_usuario(raiz);
         }
     }
