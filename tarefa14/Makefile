@@ -4,8 +4,14 @@ CFLAGS = -std=c99 -Wall -Werror -Werror=vla -g
 
 all: roteador
 
-roteador: roteador.c
-	gcc $(CFLAGS) *.c -o roteador $(LDFLAGS)
+roteador: roteador.o filaprioridade.o
+	gcc $(CFLAGS) roteador.o filaprioridade.o -o roteador $(LDFLAGS)
+
+roteador.o: roteador.c
+	gcc $(CFLAGS) -c roteador.c
+
+filaprioridade.o: filaprioridade.c
+	gcc $(CFLAGS) -c filaprioridade.c
 
 clean:
-	rm -f roteador
+	rm -f roteador roteador.o filaprioridade.o
