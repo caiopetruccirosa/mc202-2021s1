@@ -5,8 +5,14 @@ LDFLAGS = -lm
 
 all: nuvem
 
-nuvem: nuvem.c
-	gcc $(CFLAGS) *.c -o nuvem $(LDFLAGS)
+nuvem: nuvem.o tabela.o
+	gcc $(CFLAGS) nuvem.o tabela.o -o nuvem $(LDFLAGS)
+
+nuvem.o: nuvem.c
+	gcc $(CFLAGS) -c nuvem.c
+
+tabela.o: tabela.c
+	gcc $(CFLAGS) -c tabela.c
 
 clean:
-	rm -f nuvem
+	rm -f nuvem nuvem.o tabela.o
