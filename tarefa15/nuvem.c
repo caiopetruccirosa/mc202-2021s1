@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>
-#include "comum.h"
 #include "stopwords.h"
 #include "tabela.h"
 
@@ -11,18 +9,19 @@ int main() {
     scanf("%d %d ", &n, &s);
 
     char **stopwords = ler_stopwords(s);
+
     Tabela_Hash tabela = criar_tabela(n);
 
     char palavra[TAMANHO_PALAVRA];
     while(scanf("%s", palavra) != EOF) {
-        filtrar_nao_alphanumericos(palavra);
-
-        if (!eh_stopword(palavra, stopwords, s)) {
+        tratar_palavra(palavra);
+        
+        if (!eh_stopword(palavra, stopwords, s) && strlen(palavra) > 1) {
             incrementar_contagem(&tabela, palavra);
         }
     }
 
-    char **mais_frequentes = palavras_mais_frequentes(tabela);
+    imprimir_palavras_mais_frequentes(tabela);
 
     destruir_stopwords(stopwords, s);
     destruir_tabela(tabela);

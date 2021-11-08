@@ -3,6 +3,42 @@
 #include <string.h>
 #include "tabela.h"
 
+int particionamento_contador(Contador *vetor, int inicio, int fim) {
+    int posicao_pivo = fim;
+
+    int i = inicio;
+    for (int j = inicio; j < fim; j ++) {
+        if ((vetor[j].contagem > vetor[posicao_pivo].contagem) ||
+            (vetor[j].contagem == vetor[posicao_pivo].contagem && strcmp(vetor[j].palavra, vetor[posicao_pivo].palavra) < 0)) {
+            Contador aux = vetor[i];
+            vetor[i] = vetor[j];
+            vetor[j] = aux;
+
+            i++;
+        }
+    }
+
+    // Coloca o pivô no lugar dele
+    if (i != posicao_pivo) {
+        Contador aux = vetor[i];
+        vetor[i] = vetor[posicao_pivo];
+        vetor[posicao_pivo] = aux;
+
+        posicao_pivo = i;
+    }
+
+    return posicao_pivo;
+}
+
+void quick_sort_contador(Contador *vetor, int inicio, int fim) {
+    if (inicio < fim) {
+        int posicao_pivo = particionamento_contador(vetor, inicio, fim);
+
+        quick_sort_contador(vetor, inicio, posicao_pivo-1);
+        quick_sort_contador(vetor, posicao_pivo+1, fim);
+    }
+}
+
 Tabela_Hash criar_tabela(int capacidade) {
     Tabela_Hash tabela;
     
@@ -29,8 +65,8 @@ void destruir_tabela(Tabela_Hash tabela) {
     free(tabela.vetor);
 }
 
-unsigned long int hash(char palavra[TAMANHO_PALAVRA]) {
-    unsigned long int h = 41;
+unsigned int long hash(char *palavra) {
+    int h = 41;
 
     for (int i = 0; i < strlen(palavra); i++) {
         h *= 13;
@@ -40,55 +76,62 @@ unsigned long int hash(char palavra[TAMANHO_PALAVRA]) {
     return h;
 }
 
-int buscar_contagem(Tabela_Hash tabela, char palavra[TAMANHO_PALAVRA]) {
-    int idx = hash(palavra) % tabela.capacidade;
+int incrementar_contagem(Tabela_Hash *tabela, char palavra[TAMANHO_PALAVRA]) {    
+    unsigned int long h = hash(palavra);
 
-    Contador *contador = tabela.vetor[idx];
-    while (contador != NULL && strcmp(palavra, contador->palavra) != 0) {
-        if (strcmp(contador->palavra, palavra) == 0)
-            return contador->contagem;
+    for (int i = 0; i < tabela->capacidade; i++) {
+        int idx = (i + h) % tabela->capacidade;
+
+        if (tabela->vetor[idx] == NULL) {
+            // contador da palavra não foi inserido na tabela hash ainda
+            Contador *cont = malloc(sizeof(Contador));
+            
+            strcpy(cont->palavra, palavra);
+            cont->contagem = 1;
+            
+            tabela->vetor[idx] = cont;
+
+            return 1;
+        } else if (tabela->vetor[idx] != NULL && strcmp(palavra, tabela->vetor[idx]->palavra) == 0) {
+            tabela->vetor[idx]->contagem++;
+
+            return 1;
+        }
     }
 
+    // caso não tenha sido possível incrementar a contagem
     return 0;
 }
 
-void incrementar_contagem(Tabela_Hash *tabela, char palavra[TAMANHO_PALAVRA]) {    
-    int idx = hash(palavra) % tabela->capacidade;
+Contador *palavras_mais_frequentes(Tabela_Hash tabela) {
+    Contador *ordenado = malloc(tabela.capacidade * sizeof(Contador));
 
-    Contador *no = tabela->vetor[idx];
-    while (no != NULL) {
-        if (strcmp(no->palavra, palavra) == 0) {
-            no->contagem++;
-            return;
+    int tamanho = 0;
+    for (int i = 0; i < tabela.capacidade; i++) {
+        if (tabela.vetor[i] != NULL) {
+            ordenado[tamanho] = *tabela.vetor[i];
+            tamanho++;
         }
-
-        no = no->proximo;
     }
-    
-    // colisão de hash, deve inserir no início da lista ligada
-    Contador *novo = malloc(sizeof(Contador));
 
-    strcpy(novo->palavra, palavra);
-    novo->contagem = 1;
+    quick_sort_contador(ordenado, 0, tamanho-1);
 
+    Contador *mais_frequentes = malloc(QTD_PALAVRAS_MAIS_FREQUENTES * sizeof(Contador));
+    for (int i = 0; i < QTD_PALAVRAS_MAIS_FREQUENTES && tamanho; i++) {
+        mais_frequentes[i] = ordenado[i];
+    }
 
-    tabela->vetor[idx] = novo;
+    free(ordenado);
+
+    return mais_frequentes;
 }
 
-void imprimir_tabela(Tabela_Hash tabela) {
-    int soma = 0;
+void imprimir_palavras_mais_frequentes(Tabela_Hash tabela) {
+    Contador *mais_frequentes = palavras_mais_frequentes(tabela);
 
-    for (int i = 0; i < tabela.capacidade; i++) {
-        Contador *contador = tabela.vetor[i];
-
-        if (contador != NULL) {
-            soma += contador->contagem;
-
-            printf("[Índice %d] -------\n", i);
-            printf("[%s] --> %d, ", contador->palavra, contador->contagem);
-            printf("\n-----------------------\n");
-        }
+    for (int i = 0; i < QTD_PALAVRAS_MAIS_FREQUENTES; i++) {
+        printf("%s %d\n", mais_frequentes[i].palavra, mais_frequentes[i].contagem);
     }
 
-    printf("\nSoma das contagens na tabela : %d\n", soma);
+    free(mais_frequentes);
 }
