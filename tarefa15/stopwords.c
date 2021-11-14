@@ -10,10 +10,12 @@ int particionamento_stopwords(char **vetor, int inicio, int fim) {
     int i = inicio;
     for (int j = inicio; j < fim; j ++) {
         if (strcmp(vetor[j], vetor[posicao_pivo]) < 0) {
-            char aux[TAMANHO_PALAVRA];
-            strcpy(aux, vetor[i]);
-            strcpy(vetor[i], vetor[j]);
-            strcpy(vetor[j], aux);
+            if (i != j) {
+                char aux[TAMANHO_PALAVRA];
+                strcpy(aux, vetor[i]);
+                strcpy(vetor[i], vetor[j]);
+                strcpy(vetor[j], aux);
+            }
 
             i++;
         }
