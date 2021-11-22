@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "fila.h"
+#include <string.h>
 
-#define TAMANHO_NOME_CELA 100
-#define TAMANHO_NOME_JOGADOR 100
+#define TAMANHO_NOME_CELA 25
+#define TAMANHO_NOME_JOGADOR 25
 
 #define TAMANHO_PERCURSO 2
 
 /**
- * 
+ * Estrutura que armazena todos os dados de atributos.
  */
 struct atributos {
     int forca;
@@ -20,7 +21,9 @@ struct atributos {
 } typedef Atributos;
 
 /**
- * 
+ * Estrutura que representa uma cela, contendo o seu nome e um campo de 
+ * atributos que representa os atributos mínimos necessários para entrar
+ * na cela.
  */
 struct cela {
     char nome[TAMANHO_NOME_CELA];
@@ -28,25 +31,27 @@ struct cela {
 } typedef Cela;
 
 /**
- * 
+ * Estrutura que representa um jogador, armazenando o nome do personagem e
+ * o índice da cela em que o personagem irá nascer na primeira rodada.
  */
 struct jogador {
     char nome[TAMANHO_NOME_JOGADOR];
-    Atributos atributos;
     int indice_cela;
 } typedef Jogador;
 
 /**
- * 
+ * Estrutura que representa um grafo de celas, armazenando o número de celas no
+ * grafo, um vetor contendo os dados de todas as celas, e uma matriz de adjacências
+ * entre as celas no grafo.
  */
-struct grafo {
+struct grafo_cela {
     int numero_vertices;
     Cela *vertices;
     int **arestas;
-} typedef Grafo;
+} typedef Grafo_Cela;
 
 /**
- * 
+ * Função que retorna o maior valor entre dois números inteiros passados como parâmetro.
  */
 int maior(int a, int b) {
     if (a > b) {
@@ -57,10 +62,13 @@ int maior(int a, int b) {
 }
 
 /**
- * 
+ * Função que calcula a diferença entre atributos, sendo que essa diferença se trata
+ * de quantos pontos deveriam ser gastos para aprimorar uma habilidade nos atributos
+ * "origem" e chegar ao mesmo requisitos cumpridos pelo "destino".
  */
 int diferenca_atributos(Atributos origem, Atributos destino) {
-    int diferenca = maior(destino.forca - origem.forca, 0);
+    int diferenca = 0;
+    diferenca += maior(destino.forca - origem.forca, 0);
     diferenca += maior(destino.destreza - origem.destreza, 0);
     diferenca += maior(destino.constituicao - origem.constituicao, 0);
     diferenca += maior(destino.inteligencia - origem.inteligencia, 0);
@@ -71,67 +79,40 @@ int diferenca_atributos(Atributos origem, Atributos destino) {
 }
 
 /**
+ * Função que lê um grafo de celas.
  * 
+ * Essa função aloca memória dinamicamente para a criação do grafo, portanto é
+ * responsabilidade do usuário liberá-la ao sistema operacional.
  */
-Cela *ler_celas(int n) {
-    Cela *celas = malloc(n * sizeof(Cela));
+Grafo_Cela *ler_grafo_celas(int n) {
+    Grafo_Cela *grafo = malloc(sizeof(Grafo_Cela));
 
-    for (int i = 0; i < n; i++) {
-        scanf("%s %d %d %d %d %d %d", 
-            celas[i].nome, 
-            &celas[i].atributos_minimos.forca, 
-            &celas[i].atributos_minimos.destreza, 
-            &celas[i].atributos_minimos.constituicao, 
-            &celas[i].atributos_minimos.inteligencia, 
-            &celas[i].atributos_minimos.sabedoria, 
-            &celas[i].atributos_minimos.carisma);
-    }
-
-    return celas;
-}
-
-/**
- * 
- */
-Jogador *ler_jogadores(int n) {
-    Jogador *jogadores = malloc(n * sizeof(Jogador));
-
-    for (int i = 0; i < n; i++) {
-        scanf("%s %d %d %d %d %d %d", 
-            jogadores[i].nome, 
-            &jogadores[i].atributos.forca, 
-            &jogadores[i].atributos.destreza, 
-            &jogadores[i].atributos.constituicao, 
-            &jogadores[i].atributos.inteligencia, 
-            &jogadores[i].atributos.sabedoria, 
-            &jogadores[i].atributos.carisma);
-        
-        jogadores[i].indice_cela = -1;
-    }
-
-    return jogadores;
-}
-
-/**
- * 
- */
-Grafo criar_grafo(Cela *celas, int numero_celas) {
-    Grafo grafo;
-
-    grafo.numero_vertices = numero_celas;
+    grafo->numero_vertices = n;
     
-    grafo.vertices = malloc(numero_celas * sizeof(Cela));
-    grafo.arestas = malloc(numero_celas * sizeof(int*));
+    grafo->vertices = malloc(n * sizeof(Cela));
+    grafo->arestas = malloc(n * sizeof(int*));
 
-    for (int i = 0; i < numero_celas; i++) {
-        grafo.vertices[i] = celas[i];
-        grafo.arestas[i] = malloc(numero_celas * sizeof(int));
+    for (int i = 0; i < n; i++) {
+        Cela cela;
+        scanf("%s %d %d %d %d %d %d",
+            cela.nome, 
+            &cela.atributos_minimos.forca, 
+            &cela.atributos_minimos.destreza, 
+            &cela.atributos_minimos.constituicao, 
+            &cela.atributos_minimos.inteligencia, 
+            &cela.atributos_minimos.sabedoria, 
+            &cela.atributos_minimos.carisma);
 
-        for (int j = 0; j < numero_celas; j++) {
-            if (i != j && diferenca_atributos(celas[i].atributos_minimos, celas[j].atributos_minimos) <= 1) {
-                grafo.arestas[i][j] = 1;
+        grafo->vertices[i] = cela;
+        grafo->arestas[i] = malloc(n * sizeof(int));
+    }
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (i != j && diferenca_atributos(grafo->vertices[i].atributos_minimos, grafo->vertices[j].atributos_minimos) <= 1) {
+                grafo->arestas[i][j] = 1;
             } else {
-                grafo.arestas[i][j] = 0;
+                grafo->arestas[i][j] = 0;
             }
         }
     }
@@ -140,26 +121,63 @@ Grafo criar_grafo(Cela *celas, int numero_celas) {
 }
 
 /**
- * 
+ * Função que libera toda a memória alocada na construção de um grafo de celas 
+ * alocado dinamicamente.
  */
-void destruir_grafo(Grafo grafo) {
-    for (int i = 0; i < grafo.numero_vertices; i++) {
-        free(grafo.arestas[i]);
+void destruir_grafo(Grafo_Cela *grafo) {
+    for (int i = 0; i < grafo->numero_vertices; i++) {
+        free(grafo->arestas[i]);
     }
 
-    free(grafo.arestas);
-    free(grafo.vertices);
+    free(grafo->arestas);
+    free(grafo->vertices);
+    free(grafo);
 }
 
 /**
- * 
+ * Função que lê as entradas contendo os dados dos jogadores e retorna um vetor
+ * de Jogador alocado dinamicamente, logo, é responsabilidade do usuário liberar
+ * a memória associada a ele.
  */
-int eh_cela_destino(Grafo grafo, int origem, int destino) {
+Jogador *ler_jogadores(int n, Grafo_Cela *celas) {
+    Jogador *jogadores = malloc(n * sizeof(Jogador));
+
+    for (int i = 0; i < n; i++) {
+        Atributos atributos;
+
+        scanf("%s %d %d %d %d %d %d", 
+            jogadores[i].nome, 
+            &atributos.forca, 
+            &atributos.destreza, 
+            &atributos.constituicao, 
+            &atributos.inteligencia, 
+            &atributos.sabedoria, 
+            &atributos.carisma);
+        
+        for (int j = 0; j < celas->numero_vertices; j++) {
+            if (diferenca_atributos(atributos, celas->vertices[j].atributos_minimos) == 0) {
+                jogadores[i].indice_cela = j;
+                break;
+            }
+        }
+    }
+
+    return jogadores;
+}
+
+/**
+ * Função que retorna um valor booleano indicando se existe um percurso entre duas celas 
+ * no grafo de celas de tamanho menor ou igual ao tamanho máximo passado. Para isso, é 
+ * utilizado o algoritmo de busca BFS.
+ */
+int existe_percurso(Grafo_Cela *grafo, int origem, int destino, int tamanho_maximo_percurso) {
+    int existe_percurso = 0;
+    
     Fila a_visitar = criar_fila();
 
-    int *visitados = malloc(grafo.numero_vertices * sizeof(int));
-    int *anterior = malloc(grafo.numero_vertices * sizeof(int));
-    for (int i = 0; i < grafo.numero_vertices; i++) {
+    int *visitados = malloc(grafo->numero_vertices * sizeof(int));
+    int *anterior = malloc(grafo->numero_vertices * sizeof(int));
+    for (int i = 0; i < grafo->numero_vertices; i++) {
         visitados[i] = anterior[i] = 0;
     }
 
@@ -167,21 +185,21 @@ int eh_cela_destino(Grafo grafo, int origem, int destino) {
     visitados[origem] = 1;
     anterior[origem] = -1;
 
-    while (a_visitar.qtd > 0) {
+    while (a_visitar.qtd > 0 && !existe_percurso) {
         int vertice_atual = desenfileirar(&a_visitar);
 
         int tamanho_percurso = 0;
         int vertice_anterior = anterior[vertice_atual];
-        while (vertice_anterior >= 0 && tamanho_percurso <= TAMANHO_PERCURSO) {
+        while (vertice_anterior >= 0 && tamanho_percurso <= tamanho_maximo_percurso) {
             tamanho_percurso++;
             vertice_anterior = anterior[vertice_anterior];
         }
 
-        if (vertice_atual == destino && tamanho_percurso <= TAMANHO_PERCURSO) {
-            return 1;
-        } else if (tamanho_percurso < TAMANHO_PERCURSO) {
-            for (int vizinho = 0; vizinho < grafo.numero_vertices; vizinho++) {
-                if (grafo.arestas[vertice_atual][vizinho] && !visitados[vizinho]) {
+        if (vertice_atual == destino && tamanho_percurso <= tamanho_maximo_percurso) {
+            existe_percurso = 1;
+        } else if (tamanho_percurso < tamanho_maximo_percurso) {
+            for (int vizinho = 0; vizinho < grafo->numero_vertices; vizinho++) {
+                if (grafo->arestas[vertice_atual][vizinho] && !visitados[vizinho]) {
                     enfileirar(&a_visitar, vizinho);
                     visitados[vizinho] = 1;
                     anterior[vizinho] = vertice_atual;
@@ -194,29 +212,18 @@ int eh_cela_destino(Grafo grafo, int origem, int destino) {
     free(visitados);
     free(anterior);
 
-    return 0;
+    return existe_percurso;
 }
 
 /**
- * 
+ * Função que retorna um valor booleano que indica se a cela passada é um ponto de encontro
+ * entre os jogadores, passados em formato de vetor, considerando que devem se encontrar em
+ * até X rodadas, ou seja, que o tamanho do percurso máximo dos jogadores até a cela passada
+ * é menor ou igual a X, nesse caso TAMANHO_PERCURSO.
  */
-void achar_celas(Jogador *jogadores, int num_jogadores, Cela *celas, int num_celas) {
+int eh_ponto_de_encontro(Grafo_Cela *grafo, Jogador *jogadores, int num_jogadores, int destino_cela, int tamanho_maximo_percurso) {
     for (int i = 0; i < num_jogadores; i++) {
-        for (int j = 0; j < num_celas; j++) {
-            if (diferenca_atributos(jogadores[i].atributos, celas[j].atributos_minimos) == 0) {
-                jogadores[i].indice_cela = j;
-                break;
-            }
-        }
-    }
-}
-
-/**
- * 
- */
-int eh_ponto_encontro(Grafo grafo, Jogador *jogadores, int num_jogadores, int destino_cela) {
-    for (int i = 0; i < num_jogadores; i++) {
-        if (!eh_cela_destino(grafo, jogadores[i].indice_cela, destino_cela)) {
+        if (!existe_percurso(grafo, jogadores[i].indice_cela, destino_cela, tamanho_maximo_percurso)) {
             return 0;
         }
     }
@@ -227,32 +234,26 @@ int eh_ponto_encontro(Grafo grafo, Jogador *jogadores, int num_jogadores, int de
 int main() {
     int numero_celas;
     scanf("%d", &numero_celas);
-    Cela* celas = ler_celas(numero_celas);
+    Grafo_Cela *celas = ler_grafo_celas(numero_celas);
 
     int numero_jogadores;
     scanf("%d", &numero_jogadores);
-    Jogador* jogadores = ler_jogadores(numero_jogadores);
+    Jogador* jogadores = ler_jogadores(numero_jogadores, celas);
 
-    achar_celas(jogadores, numero_jogadores, celas, numero_celas);
-
-    Grafo grafo = criar_grafo(celas, numero_celas);
-
-    int contagem = 0;
+    int eh_possivel = 0;
     for (int i = 0; i < numero_celas; i++) {
-        if (eh_ponto_encontro(grafo, jogadores, numero_jogadores, i)) {
-            printf("%s\n", celas[i].nome);
-            contagem++;
+        if (eh_ponto_de_encontro(celas, jogadores, numero_jogadores, i, TAMANHO_PERCURSO)) {
+            printf("%s\n", celas->vertices[i].nome);
+            eh_possivel = 1;
         }
     }
 
-    if (contagem == 0) {
+    // caso não tenha imprimido nenhum nome, "eh_possivel" terá o valor 0.
+    if (!eh_possivel)
         printf("Impossivel terminar em duas rodadas.\n");
-    }
 
-    destruir_grafo(grafo);
-
+    destruir_grafo(celas);
     free(jogadores);
-    free(celas);
 
     return 0;
 }
