@@ -191,6 +191,8 @@ int eh_cela_destino(Grafo grafo, int origem, int destino) {
     }
 
     destruir_fila(a_visitar);
+    free(visitados);
+    free(anterior);
 
     return 0;
 }
