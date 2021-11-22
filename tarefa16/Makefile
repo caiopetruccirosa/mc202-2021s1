@@ -5,8 +5,14 @@ LDFLAGS = -lm
 
 all: rpg
 
-rpg: rpg.c
-	gcc $(CFLAGS) *.c -o rpg $(LDFLAGS)
+rpg: rpg.o fila.o
+	gcc $(CFLAGS) rpg.o fila.o -o rpg $(LDFLAGS)
+
+rpg.o: rpg.c
+	gcc $(CFLAGS) -c rpg.c
+
+fila.o: fila.c
+	gcc $(CFLAGS) -c fila.c
 
 clean:
-	rm -f rpg
+	rm -f rpg rpg.o fila.o
